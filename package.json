@@ -4,7 +4,10 @@
   "description": "Personal telegram bot",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "lint:package": "prettier-package-json --write package.json; lerna run lint:package"
   },
   "repository": {
     "type": "git",
@@ -15,5 +18,13 @@
   "bugs": {
     "url": "https://github.com/negebauer/telegram-bot/issues"
   },
-  "homepage": "https://github.com/negebauer/telegram-bot#readme"
+  "homepage": "https://github.com/negebauer/telegram-bot#readme",
+  "devDependencies": {
+    "@negebauer/eslint-config-base": "^1.2.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.9.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4"
+  }
 }
