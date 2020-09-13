@@ -140,6 +140,11 @@
     eslint-config-prettier "^6.9.0"
     prettier "^1.19.1"
 
+"@negebauer/prettier-config@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@negebauer/prettier-config/-/prettier-config-1.0.3.tgz#3089f57a8d6cb101994a24129b0cf37d2db41729"
+  integrity sha512-uLT1TCeVxzfbWAOFRHjhwUfIy5HFqYKOTb/+r0467PFyHX+ajk0Qx7CFxR2jSxf8jOuy57/XpZSfy16JKnvYdw==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"

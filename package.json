@@ -21,6 +21,7 @@
   "homepage": "https://github.com/negebauer/telegram-bot#readme",
   "devDependencies": {
     "@negebauer/eslint-config-base": "^1.2.0",
+    "@negebauer/prettier-config": "^1.0.3",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.9.0",
     "eslint-plugin-import": "^2.22.0",
