@@ -6,15 +6,17 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "yarn build --watch",
-    "dev": "nodemon --watch src --ext ts,js",
+    "dev": "nodemon --watch src --ext ts,js node -r ts-node/register",
+    "dev:file": "nodemon --ext ts,js",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
-    "lint:code": "eslint src",
+    "lint:code": "eslint src scripts",
     "lint:code:fix": "yarn lint:code --fix",
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
     "start": "node -r ts-node/register ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "updateCommands": "ts-node ./scripts/updateCommands.ts"
   },
   "dependencies": {
     "@types/node": "^14.10.1",
@@ -24,6 +26,8 @@
   "devDependencies": {
     "@negebauer/eslint-config-base": "^1.2.0",
     "@negebauer/prettier-config": "^1.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
     "babel-eslint": "^10.1.0",
     "concurrently": "^5.3.0",
     "eslint": "^7.9.0",
