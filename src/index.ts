@@ -1,26 +1,8 @@
-import * as fs from 'fs';
+import { Telegraf } from 'telegraf'
+import config from './config'
 
-const a = ' b'
-
-export function asd(b: String) {
-  return b + 'a'
-}
-
-interface User {
-  name: String,
-  age: Number,
-  foo?: Function,
-}
-
-const user: User = {
-  name: a,
-  age: 14
-}
-
-// user.foo = function foo() {
-//   return null
-// }
-
-// user.foo()
-
-console.log(asd(a))
+const bot = new Telegraf(config.botToken)
+bot.command('oldschool', (ctx) => ctx.reply('Hello'))
+bot.command('modern', ({ reply }) => reply('Yo'))
+bot.command('hipster', Telegraf.reply('λ'))
+bot.launch()

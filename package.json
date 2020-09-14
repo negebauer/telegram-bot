@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "build:watch": "yarn build --watch",
     "dev": "nodemon --watch src --ext ts,js",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@types/node": "^14.10.1",
+    "telegraf": "^3.38.0",
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
