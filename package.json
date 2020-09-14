@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "yarn build --watch",
-    "dev": "nodemon --watch src --ext ts,js node -r ts-node/register",
+    "dev": "nodemon --watch src --ext ts,js,txt node -r ts-node/register",
     "dev:file": "nodemon --ext ts,js",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src scripts",
@@ -14,6 +14,7 @@
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
+    "sendMessage": "ts-node ./scripts/sendMessage.ts $CHAT_ID",
     "start": "node -r ts-node/register ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "updateCommands": "ts-node ./scripts/updateCommands.ts"
@@ -21,6 +22,7 @@
   "dependencies": {
     "@types/node": "^14.10.1",
     "telegraf": "^3.38.0",
+    "telegraf-session-local": "^2.0.0",
     "ts-node": "^9.0.0"
   },
   "devDependencies": {

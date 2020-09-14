@@ -1,1 +1,18 @@
-BOT_TOKEN=BOT_TOKEN
+# Copy this file to .envrc
+
+########################################
+##### Don't replace this variables #####
+########################################
+
+# The filename for the database.
+export DATABASE_FILE_NAME=db.json
+
+# Copy this file to .envrc
+
+########################################
+#####    Replace this variables    #####
+########################################
+
+# The telegram bot token
+export BOT_TOKEN=BOT_TOKEN
+export CHAT_ID=CHAT_ID

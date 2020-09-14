@@ -1,4 +1,4 @@
-const { BOT_TOKEN, NODE_ENV } = process.env
+const { DATABASE_FILE_NAME = 'db.json', BOT_TOKEN, NODE_ENV } = process.env
 
 const isDev = NODE_ENV === 'development'
 const isProd = NODE_ENV === 'production'
@@ -11,6 +11,7 @@ const config = {
     isTest,
   },
   botToken: BOT_TOKEN as string,
+  databaseFileName: DATABASE_FILE_NAME,
 }
 
 export default config
