@@ -11,8 +11,13 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "outDir": "dist"
   },
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 12"
+  "display": "Node 12",
+  "include": [
+    "src/**/*"
+  ]
 }
