@@ -2,6 +2,7 @@
   "name": "@negebauer/telegram-bot",
   "version": "0.0.1",
   "description": "Personal telegram bot",
+  "license": "MIT",
   "scripts": {
     "dev": "nodemon src/index.js",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
