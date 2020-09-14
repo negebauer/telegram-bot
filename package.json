@@ -14,6 +14,7 @@
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
+    "sendMessage": "ts-node ./scripts/sendMessage.ts $CHAT_ID",
     "start": "node -r ts-node/register ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "updateCommands": "ts-node ./scripts/updateCommands.ts"
