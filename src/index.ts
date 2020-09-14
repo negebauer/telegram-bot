@@ -1,7 +1,9 @@
+import * as fs from 'fs';
+
 const a = ' b'
 
-function asd(a: String) {
-  return a
+export function asd(b: String) {
+  return b + 'a'
 }
 
-asd(a)
+console.log(asd(a))
