@@ -9,7 +9,16 @@ const allowList = fs
   .split('\n')
 
 interface Session {
-  counter?: number
+  user: {
+    username: string
+    firstName: string
+    lastName: string
+    chatId: number
+    userId: number
+  }
+  soccer?: {
+    weight: number
+  }
 }
 
 interface BotContext extends TelegrafContext {
@@ -29,16 +38,16 @@ bot.use((ctx, next) => {
 bot.use(session.middleware())
 
 bot.use((ctx, next) => {
-  // eslint-disable-next-line camelcase
-  const { id: userId, username, first_name, last_name } = ctx.from || {}
+  const { id: userId, username, first_name: firstName, last_name: lastName } =
+    ctx.from || {}
   const { id: chatId } = ctx.chat || {}
-  Object.assign(ctx.session, {
-    userId,
-    username,
-    first_name,
-    last_name,
-    chatId,
-  })
+  ctx.session.user = {
+    userId: userId as number,
+    username: username as string,
+    firstName: firstName as string,
+    lastName: lastName as string,
+    chatId: chatId as number,
+  }
   return next()
 })
 
