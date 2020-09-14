@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src",
-    "lint:code:fix": "yarn lint:code -f",
+    "lint:code:fix": "yarn lint:code --fix",
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
