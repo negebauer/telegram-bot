@@ -4,7 +4,7 @@
   "description": "Personal telegram bot",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "nodemon --watch src --ext ts,js",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src",
     "lint:code:fix": "yarn lint:code --fix",
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@negebauer/eslint-config-base": "^1.2.0",
     "@negebauer/prettier-config": "^1.0.3",
+    "@tsconfig/recommended": "^1.0.1",
     "babel-eslint": "^10.1.0",
     "concurrently": "^5.3.0",
     "eslint": "^7.9.0",
