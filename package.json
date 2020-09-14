@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@types/node": "^14.10.1",
+    "telegraf": "^3.38.0",
     "ts-node": "^9.0.0"
   },
   "devDependencies": {
