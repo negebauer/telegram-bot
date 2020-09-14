@@ -1,5 +1,7 @@
 const a = ' b'
-function asd(a) {
+
+function asd(a: String) {
   return a
 }
+
 asd(a)
