@@ -63,28 +63,40 @@ bot.use((ctx, next) => {
   return next()
 })
 
+bot.command('weight', ctx => {
+  const text = ctx.message?.text?.replace('/weight', '').trim()
+  if (!text)
+    return ctx.replyWithMarkdown(
+      `Current is ${ctx.session.weight}\n\n${commandToMarkdown(
+        commands.weight,
+      )}`,
+    )
+
+  const weight = Number(text)
+  if (!weight) return ctx.reply(`Weight must be a number, ${text} is invalid`)
+
+  ctx.session.weight = weight
+  return ctx.reply(`Saved weight ${weight}kg`)
+})
+
 function soccerCalories(weight: number, minutes: number) {
   return Math.floor(((7 * weight * 3.5) / 200) * minutes)
 }
 
 bot.command('soccer', ctx => {
   const { weight } = ctx.session
-  if (!weight) {
-    ctx.replyWithMarkdown(
+  if (!weight)
+    return ctx.replyWithMarkdown(
       `Your first need to add your weight\n\n${commandToMarkdown(
         commands.weight,
       )}`,
     )
-    return
-  }
 
   const text = ctx.message?.text?.replace('/soccer', '').trim()
-  if (!text) {
-    ctx.replyWithMarkdown(commandToMarkdown(commands.soccer))
-    return
-  }
+  if (!text) return ctx.replyWithMarkdown(commandToMarkdown(commands.soccer))
 
   const [startTimeOrTime, endTime] = text.split(' ')
+  let totalMinutes
   if (endTime) {
     const [startHour, startMinute = 0] = startTimeOrTime.split(':')
     const [endHour, endMinute = 0] = endTime.split(':')
@@ -94,15 +106,14 @@ bot.command('soccer', ctx => {
     const end = dayjs()
       .hour(Number(endHour))
       .minute(Number(endMinute))
-    const totalMinutes = end.diff(start, 'minute')
-    const calories = soccerCalories(85, totalMinutes)
-    ctx.reply(`You just burnt ${calories} calories`)
+    totalMinutes = end.diff(start, 'minute')
   } else {
     const [hours, minutes] = startTimeOrTime.split('h')
-    const totalMinutes = Number(hours) * 60 + Number(minutes)
-    const calories = soccerCalories(85, totalMinutes)
-    ctx.reply(`You just burnt ${calories} calories`)
+    totalMinutes = Number(hours) * 60 + Number(minutes)
   }
+
+  const calories = soccerCalories(85, totalMinutes)
+  return ctx.reply(`You just burnt ${calories} calories`)
 })
 
 bot.help(ctx => ctx.replyWithMarkdown(helpMarkdown))
