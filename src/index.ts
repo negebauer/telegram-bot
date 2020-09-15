@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Telegraf, Context } from 'telegraf'
 import LocalSession from 'telegraf-session-local'
+import dayjs from 'dayjs'
 import { SceneContextMessageUpdate } from '../node_modules/telegraf/typings/stage.d'
 import config from './config'
 import loadCommands, { Command } from './loadCommands'
@@ -34,13 +35,11 @@ interface BotContext extends BaseBotContext {
   session: Session
 }
 
-// init
 const bot = new Telegraf<BotContext>(config.botToken)
 const session = new LocalSession<BotContext>({
   database: config.databaseFileName,
 })
 
-// middlewares
 bot.use((ctx, next) => {
   const { username } = ctx.from || {}
   const authorized = allowList.includes(username as string)
@@ -69,23 +68,44 @@ function soccerCalories(weight: number, minutes: number) {
 }
 
 bot.command('soccer', ctx => {
-  let { text } = ctx.message || {}
-  if (!text) return
+  const { weight } = ctx.session
+  if (!weight) {
+    ctx.replyWithMarkdown(
+      `Your first need to add your weight\n\n${commandToMarkdown(
+        commands.weight,
+      )}`,
+    )
+    return
+  }
 
-  text = text.replace('/soccer', '').trim()
-  ctx.reply(`${soccerCalories(85.1, 60)}`)
-  ctx.reply(text)
+  const text = ctx.message?.text?.replace('/soccer', '').trim()
+  if (!text) {
+    ctx.replyWithMarkdown(commandToMarkdown(commands.soccer))
+    return
+  }
+
+  const [startTimeOrTime, endTime] = text.split(' ')
+  if (endTime) {
+    const [startHour, startMinute = 0] = startTimeOrTime.split(':')
+    const [endHour, endMinute = 0] = endTime.split(':')
+    const start = dayjs()
+      .hour(Number(startHour))
+      .minute(Number(startMinute))
+    const end = dayjs()
+      .hour(Number(endHour))
+      .minute(Number(endMinute))
+    const totalMinutes = end.diff(start, 'minute')
+    const calories = soccerCalories(85, totalMinutes)
+    ctx.reply(`You just burnt ${calories} calories`)
+  } else {
+    const [hours, minutes] = startTimeOrTime.split('h')
+    const totalMinutes = Number(hours) * 60 + Number(minutes)
+    const calories = soccerCalories(85, totalMinutes)
+    ctx.reply(`You just burnt ${calories} calories`)
+  }
 })
 
-bot.help(ctx => {
-  const commands = loadCommands()
-  const markdown = commands.map(
-    ({ command, description, details }) =>
-      `/${command}\n${description}\n${details}`,
-  )
-
-  ctx.replyWithMarkdown(markdown.join('\n\n'))
-})
+bot.help(ctx => ctx.replyWithMarkdown(helpMarkdown))
 
 bot.launch().then(() => {
   // eslint-disable-next-line no-console
