@@ -23,9 +23,9 @@ interface Session {
   }
 }
 
-type i = Context & SceneContextMessageUpdate
+type BaseBotContext = Context & SceneContextMessageUpdate
 
-interface BotContext extends i {
+interface BotContext extends BaseBotContext {
   session: Session
 }
 
@@ -59,21 +59,27 @@ bot.use((ctx, next) => {
   return next()
 })
 
+function soccerCalories(weight: number, minutes: number) {
+  return Math.floor(((7 * weight * 3.5) / 200) * minutes)
+}
+
 // soccer scene
+function handleSoccer(ctx: BotContext) {
+  let { text } = ctx.message || {}
+  if (!text) return
+
+  text = text.replace('/soccer', '').trim()
+  ctx.reply(`${soccerCalories(85.1, 60)}`)
+  ctx.reply(text)
+}
+
 const soccerScene = new BaseScene<BotContext>('soccer')
-soccerScene.enter(ctx => {
-  // eslint-disable-next-line no-console
-  console.log(ctx.message)
-})
-soccerScene.leave(ctx => {
-  ctx.reply('bye')
-})
-soccerScene.hears('hi', ctx => ctx.scene.enter('soccer'))
-soccerScene.on('message', ctx => ctx.replyWithMarkdown('Send `hi`'))
+soccerScene.enter(handleSoccer)
+soccerScene.on('text', handleSoccer)
 soccerScene.command('back', ctx => ctx.scene.leave())
 
 // bot
-const stage = new Stage<BotContext>([soccerScene], { ttl: 10 })
+const stage = new Stage<BotContext>([soccerScene])
 bot.use(stage.middleware())
 
 bot.command('soccer', ctx => ctx.scene.enter('soccer'))
