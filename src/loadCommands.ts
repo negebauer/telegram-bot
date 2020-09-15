@@ -1,13 +1,13 @@
 import fs from 'fs'
 import path from 'path'
 
-interface Command {
+export interface Command {
   command: string
   description: string
   details: string
 }
 
-const commands: Command[] = []
+const commands: Record<string, Command> = {}
 const emptyCommand: Command = {
   command: '',
   description: '',
@@ -19,11 +19,11 @@ function foundCommand(command: Command) {
   command.description = command.description.trim()
   // eslint-disable-next-line no-param-reassign
   command.details = command.details.trim()
-  commands.push(command)
+  commands[command.command] = command
 }
 
-function loadCommands(): Command[] {
-  if (commands.length > 0) return commands
+function loadCommands(): Record<string, Command> {
+  if (Object.values(commands).length > 0) return commands
 
   const commandsPath = path.join(__dirname, '..', 'COMMANDS.md')
   const commandsText = fs.readFileSync(commandsPath, { encoding: 'utf8' })

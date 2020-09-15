@@ -4,7 +4,7 @@ import loadCommands from '../src/loadCommands'
 
 const commands = loadCommands()
 const telegram = new Telegram(config.botToken)
-telegram.setMyCommands(commands)
+telegram.setMyCommands(Object.values(commands))
 // eslint-disable-next-line no-console
 console.log('Commands updated')
 // eslint-disable-next-line no-console

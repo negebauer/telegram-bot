@@ -4,13 +4,21 @@ import { Telegraf, Context } from 'telegraf'
 import LocalSession from 'telegraf-session-local'
 import { SceneContextMessageUpdate } from '../node_modules/telegraf/typings/stage.d'
 import config from './config'
-import loadCommands from './loadCommands'
+import loadCommands, { Command } from './loadCommands'
 
 const allowList = fs
   .readFileSync(path.join(__dirname, 'allowList.txt'), { encoding: 'utf8' })
   .split('\n')
 
-// types
+function commandToMarkdown({ command, description, details }: Command) {
+  return `/${command}\n${description}\n${details}`
+}
+
+const commands = loadCommands()
+const helpMarkdown = Object.values(commands)
+  .map(commandToMarkdown)
+  .join('\n\n')
+
 interface Session {
   username: string
   firstName: string
