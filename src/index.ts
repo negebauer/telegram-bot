@@ -17,9 +17,7 @@ function commandToMarkdown({ command, description, details }: Command) {
 }
 
 const commands = loadCommands()
-const helpMarkdown = Object.values(commands)
-  .map(commandToMarkdown)
-  .join('\n\n')
+const helpMarkdown = Object.values(commands).map(commandToMarkdown).join('\n\n')
 
 interface Session {
   username: string
@@ -38,7 +36,7 @@ export interface BotContext extends BaseBotContext {
 
 const bot = new Telegraf<BotContext>(config.botToken)
 const session = new LocalSession<BotContext>({
-  database: config.databaseFileName,
+  database: 'volume/db.json',
 })
 
 bot.use((ctx, next) => {
@@ -64,7 +62,7 @@ bot.use((ctx, next) => {
   return next()
 })
 
-bot.command('weight', ctx => {
+bot.command('weight', (ctx) => {
   const text = ctx.message?.text?.replace('/weight', '').trim()
   if (!text)
     return ctx.replyWithMarkdown(
@@ -84,7 +82,7 @@ function soccerCalories(weight: number, minutes: number) {
   return Math.floor(((7 * weight * 3.5) / 200) * minutes)
 }
 
-bot.command('soccer', ctx => {
+bot.command('soccer', (ctx) => {
   const { weight } = ctx.session
   if (!weight)
     return ctx.replyWithMarkdown(
@@ -101,12 +99,8 @@ bot.command('soccer', ctx => {
   if (endTime) {
     const [startHour, startMinute = 0] = startTimeOrTime.split(':')
     const [endHour, endMinute = 0] = endTime.split(':')
-    const start = dayjs()
-      .hour(Number(startHour))
-      .minute(Number(startMinute))
-    const end = dayjs()
-      .hour(Number(endHour))
-      .minute(Number(endMinute))
+    const start = dayjs().hour(Number(startHour)).minute(Number(startMinute))
+    const end = dayjs().hour(Number(endHour)).minute(Number(endMinute))
     totalMinutes = end.diff(start, 'minute')
   } else {
     const [hours, minutes] = startTimeOrTime.split('h')
@@ -118,10 +112,10 @@ bot.command('soccer', ctx => {
 })
 
 bot.command('visa', (ctx, next) =>
-  visa(ctx, next).catch(error => ctx.reply(error.toString())),
+  visa(ctx, next).catch((error) => ctx.reply(error.toString())),
 )
 
-bot.help(ctx => ctx.replyWithMarkdown(helpMarkdown))
+bot.help((ctx) => ctx.replyWithMarkdown(helpMarkdown))
 
 bot.launch().then(() => {
   // eslint-disable-next-line no-console

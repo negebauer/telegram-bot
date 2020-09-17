@@ -29,7 +29,7 @@ function loadCommands(): Record<string, Command> {
   const commandsText = fs.readFileSync(commandsPath, { encoding: 'utf8' })
   let nextComand = { ...emptyCommand }
 
-  commandsText.split('\n').forEach(line => {
+  commandsText.split('\n').forEach((line) => {
     if (line.substring(0, 2) === '##') {
       if (nextComand.command) foundCommand(nextComand)
 
