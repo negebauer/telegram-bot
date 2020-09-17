@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer'
 import config from './config'
 import { BotContext } from '.'
 
-const MAX_TRIES = 3
+const MAX_TRIES = 5
 const url =
   'https://ais.usvisa-info.com/es-cl/niv/schedule/31589460/continue_actions'
 
@@ -11,12 +11,13 @@ async function visa(
   next: unknown,
   tryNumber = 1,
 ): Promise<unknown> {
-  ctx.reply(`Checking visa appointment info, try ${tryNumber}`)
+  ctx.reply(`#${tryNumber} Checking visa appointment info`)
 
   const browser = await puppeteer.launch({
     headless: true,
     defaultViewport: null,
     slowMo: 50,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
   const page = await browser.newPage()
   await page.goto(url)
@@ -35,7 +36,7 @@ async function visa(
 
   const inPage = (await page.url()) === url
   if (!inPage) {
-    if (tryNumber <= MAX_TRIES) return visa(ctx, next, tryNumber + 1)
+    if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
     return ctx.reply('FAILED')
   }
 

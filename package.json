@@ -14,10 +14,12 @@
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
-    "sendMessage": "ts-node ./scripts/sendMessage.ts $CHAT_ID",
-    "start": "node -r ts-node/register ./src/index.ts",
+    "sendMessage": "ts-node scripts/sendMessage.ts $CHAT_ID",
+    "start": "node -r ts-node/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "updateCommands": "ts-node ./scripts/updateCommands.ts"
+    "updateCommands": "ts-node scripts/updateCommands.ts",
+    "docker:build": "docker build -t negebauer/telegram-bot .",
+    "docker:run": "docker run --rm -ti -e VISA_USER=$VISA_USER -e VISA_PASSWORD=$VISA_PASSWORD -e BOT_TOKEN=$BOT_TOKEN -v $(pwd)/volume:/volume negebauer/telegram-bot"
   },
   "dependencies": {
     "@types/node": "^14.10.1",
