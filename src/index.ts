@@ -6,13 +6,14 @@ import dayjs from 'dayjs'
 import { SceneContextMessageUpdate } from '../node_modules/telegraf/typings/stage.d'
 import config from './config'
 import loadCommands, { Command } from './loadCommands'
+import visa from './visa'
 
 const allowList = fs
   .readFileSync(path.join(__dirname, 'allowList.txt'), { encoding: 'utf8' })
   .split('\n')
 
 function commandToMarkdown({ command, description, details }: Command) {
-  return `/${command}\n${description}\n${details}`
+  return `/${command}\n${description}${details ? `\n${details}` : ''}`
 }
 
 const commands = loadCommands()
@@ -31,7 +32,7 @@ interface Session {
 
 type BaseBotContext = Context & SceneContextMessageUpdate
 
-interface BotContext extends BaseBotContext {
+export interface BotContext extends BaseBotContext {
   session: Session
 }
 
@@ -115,6 +116,10 @@ bot.command('soccer', ctx => {
   const calories = soccerCalories(85, totalMinutes)
   return ctx.reply(`You just burnt ${calories} calories`)
 })
+
+bot.command('visa', (ctx, next) =>
+  visa(ctx, next).catch(error => ctx.reply(error.toString())),
+)
 
 bot.help(ctx => ctx.replyWithMarkdown(helpMarkdown))
 
