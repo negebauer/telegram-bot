@@ -1,15 +1,13 @@
 # Commands <!-- omit in TOC -->
 
-- [weight](#weight)
-- [soccer](#soccer)
 - [help](#help)
+- [soccer](#soccer)
+- [visa](#visa)
+- [weight](#weight)
 
-## weight
+## help
 
-Update your weight for the soccer calories calculation.
-
-- `/weight amount`: where amount is in kg.
-  - `/weight 86`
+Show the help menu.
 
 ## soccer
 
@@ -22,6 +20,13 @@ Get the amount of calories for playing soccer.
   - `/soccer 10:00 11:30`
   - `/soccer 10 11`
 
-## help
+## visa
 
-Show the help menu.
+Get the available visa appointment dates.
+
+## weight
+
+Update your weight for the soccer calories calculation.
+
+- `/weight amount`: where amount is in kg.
+  - `/weight 86`
