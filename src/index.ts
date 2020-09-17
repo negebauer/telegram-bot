@@ -38,7 +38,7 @@ export interface BotContext extends BaseBotContext {
 
 const bot = new Telegraf<BotContext>(config.botToken)
 const session = new LocalSession<BotContext>({
-  database: config.databaseFileName,
+  database: 'volume/db.json',
 })
 
 bot.use((ctx, next) => {
