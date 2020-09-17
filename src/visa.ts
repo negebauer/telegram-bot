@@ -42,13 +42,13 @@ async function visa(
   // check appointment not canceled
   const liElements = await page.$$('li.accordion-item > a > h5')
   const textContext = await Promise.all(
-    liElements.map(element =>
+    liElements.map((element) =>
       element
         .getProperty('textContent')
-        .then(textContent => textContent.jsonValue()),
+        .then((textContent) => textContent.jsonValue()),
     ),
   )
-  const changeAppointmentButtonIndex = textContext.findIndex(text => {
+  const changeAppointmentButtonIndex = textContext.findIndex((text) => {
     if (typeof text === 'string') {
       return text.trim() === 'Reprogramar cita'
     }
@@ -61,9 +61,9 @@ async function visa(
   await changeAppointmentShowButton.click()
   const changeAppointmentButton = await changeAppointmentShowButton
     .getProperty('parentElement')
-    .then(e1 => e1.getProperty('parentElement'))
-    .then(e2 => e2.getProperty('lastElementChild'))
-    .then(e3 => e3.asElement()?.$('a'))
+    .then((e1) => e1.getProperty('parentElement'))
+    .then((e2) => e2.getProperty('lastElementChild'))
+    .then((e3) => e3.asElement()?.$('a'))
   if (!changeAppointmentButton) return 'changeAppointmentButton notFound'
 
   await changeAppointmentButton.click()
