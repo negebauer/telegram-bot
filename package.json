@@ -8,6 +8,9 @@
     "build:watch": "yarn build --watch",
     "dev": "nodemon --watch src --ext ts,js,txt node -r ts-node/register",
     "dev:file": "nodemon --ext ts,js",
+    "docker:build": "docker build -t negebauer/telegram-bot .",
+    "docker:push": "docker push negebauer/telegram-bot",
+    "docker:run": "docker run --rm -ti -e VISA_USER=$VISA_USER -e VISA_PASSWORD=$VISA_PASSWORD -e BOT_TOKEN=$BOT_TOKEN -v $(pwd)/volume:/volume negebauer/telegram-bot",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src scripts",
     "lint:code:fix": "yarn lint:code --fix",
@@ -17,9 +20,7 @@
     "sendMessage": "ts-node scripts/sendMessage.ts $CHAT_ID",
     "start": "node -r ts-node/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "updateCommands": "ts-node scripts/updateCommands.ts",
-    "docker:build": "docker build -t negebauer/telegram-bot .",
-    "docker:run": "docker run --rm -ti -e VISA_USER=$VISA_USER -e VISA_PASSWORD=$VISA_PASSWORD -e BOT_TOKEN=$BOT_TOKEN -v $(pwd)/volume:/volume negebauer/telegram-bot"
+    "updateCommands": "ts-node scripts/updateCommands.ts"
   },
   "dependencies": {
     "@types/node": "^14.10.1",
