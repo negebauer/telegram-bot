@@ -13,7 +13,7 @@ const allowList = fs
   .split('\n')
 
 function commandToMarkdown({ command, description, details }: Command) {
-  return `/${command}\n${description}\n${details}`
+  return `/${command}\n${description}${details ? `\n${details}` : ''}`
 }
 
 const commands = loadCommands()
