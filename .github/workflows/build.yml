@@ -71,9 +71,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: buildx-${{ runner.os }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            buildx-
 
       - name: Login to DockerHub
         if: github.event_name == 'push'
