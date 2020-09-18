@@ -1,0 +1,86 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13
+
+      - name: Cache node_modules
+        id: cache
+        uses: actions/cache@v2.1.0
+        with:
+          path: |
+            ~/.yarn-cache
+            node_modules
+          key: yarn_cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: yarn_cache-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn
+
+      - name: Lint code
+        id: lint_code
+        if: success() || failure()
+        run: yarn lint:code
+
+      - name: Lint package.json
+        id: lint_package
+        if: success() || failure()
+        run: yarn lint:package
+
+      - name: Comment CI errors
+        if: github.event_name == 'pull_request' && failure()
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            |api-proxy|status|
+            |-|-|
+            |lint_code|${{ steps.lint_code.outcome == 'failure' && '❌' || '' }}${{ steps.lint_code.outcome == 'success' && '✅' || '' }}|
+            |lint_package|${{ steps.lint_package.outcome == 'failure' && '❌' || '' }}${{ steps.lint_package.outcome == 'success' && '✅' || '' }}|
+
+      - name: Set up Docker Buildx
+        # if: github.event_name == 'push'
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        # if: github.event_name == 'push'
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Login to DockerHub
+        # if: github.event_name == 'push'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push docker image
+        # if: github.event_name == 'push'
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: negebauer/telegram-bot
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
