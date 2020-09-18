@@ -11,5 +11,6 @@
 # The telegram bot token
 export BOT_TOKEN=BOT_TOKEN
 export CHAT_ID=CHAT_ID
-export VISA_USER=VISA_USER
 export VISA_PASSWORD=VISA_PASSWORD
+export VISA_URL=VISA_URL
+export VISA_USER=VISA_USER

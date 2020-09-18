@@ -2,6 +2,7 @@ const {
   BOT_TOKEN,
   CHAT_ID,
   VISA_PASSWORD,
+  VISA_URL,
   VISA_USER,
   NODE_ENV = 'development',
 } = process.env
@@ -21,6 +22,7 @@ const config = {
   visa: {
     email: VISA_USER as string,
     password: VISA_PASSWORD as string,
+    url: VISA_URL as string,
   },
 }
 
