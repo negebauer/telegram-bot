@@ -56,6 +56,17 @@ jobs:
             |lint_code|${{ steps.lint_code.outcome == 'failure' && '❌' || '' }}${{ steps.lint_code.outcome == 'success' && '✅' || '' }}|
             |lint_package|${{ steps.lint_package.outcome == 'failure' && '❌' || '' }}${{ steps.lint_package.outcome == 'success' && '✅' || '' }}|
 
+      - name: Update dev bot commands
+        env:
+          BOT_TOKEN: ${{ secrets.DEV_BOT_TOKEN }}
+        run: yarn updateCommands
+
+      - name: Update prod bot commands
+        # if: github.event_name == 'push'
+        env:
+          BOT_TOKEN: ${{ secrets.PROD_BOT_TOKEN }}
+        run: yarn updateCommands
+
       - name: Set up Docker Buildx
         # if: github.event_name == 'push'
         uses: docker/setup-buildx-action@v1
