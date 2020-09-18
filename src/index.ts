@@ -111,9 +111,7 @@ bot.command('soccer', (ctx) => {
   return ctx.reply(`You just burnt ${calories} calories`)
 })
 
-bot.command('visa', (ctx, next) =>
-  visa(ctx, next).catch((error) => ctx.reply(error.toString())),
-)
+bot.command('visa', (ctx, next) => visa(ctx, next))
 
 bot.help((ctx) => ctx.replyWithMarkdown(helpMarkdown))
 
