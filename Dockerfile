@@ -24,4 +24,5 @@ COPY COMMANDS.md COMMANDS.md
 COPY tsconfig.json tsconfig.json
 COPY src src
 
+ENV NODE_ENV production
 CMD ["yarn", "start"]
