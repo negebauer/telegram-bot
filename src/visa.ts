@@ -3,8 +3,7 @@ import config from './config'
 import { BotContext } from '.'
 
 const MAX_TRIES = 5
-const url =
-  'https://ais.usvisa-info.com/es-cl/niv/schedule/31589460/continue_actions'
+const { url } = config.visa
 
 function retry(
   ctx: BotContext,
