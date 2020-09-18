@@ -72,6 +72,7 @@ async function visa(
 
   // check next appointment
   await page.click('#appointments_consulate_appointment_date')
+  if (new Date().getMonth() === 8) await page.click('a[title="Next"]')
   const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
   return ctx.replyWithPhoto({ source: screenshotBuffer })
 }
