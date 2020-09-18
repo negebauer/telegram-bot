@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { Telegraf, Context } from 'telegraf'
+import { Telegram, Telegraf, Context } from 'telegraf'
 import LocalSession from 'telegraf-session-local'
 import dayjs from 'dayjs'
 import { SceneContextMessageUpdate } from '../node_modules/telegraf/typings/stage.d'
@@ -34,6 +34,7 @@ export interface BotContext extends BaseBotContext {
   session: Session
 }
 
+const telegram = new Telegram(config.botToken)
 const bot = new Telegraf<BotContext>(config.botToken)
 const session = new LocalSession<BotContext>({
   database: 'volume/db.json',
@@ -118,4 +119,5 @@ bot.help((ctx) => ctx.replyWithMarkdown(helpMarkdown))
 bot.launch().then(() => {
   // eslint-disable-next-line no-console
   console.log('Bot started successfully')
+  if (config.env.isProd) telegram.sendMessage(config.chatId, 'Bot deployed')
 })

@@ -10,7 +10,7 @@
     "dev:file": "nodemon --ext ts,js",
     "docker:build": "docker build -t negebauer/telegram-bot .",
     "docker:push": "docker push negebauer/telegram-bot",
-    "docker:run": "docker run --rm -ti -e VISA_USER=$VISA_USER -e VISA_PASSWORD=$VISA_PASSWORD -e BOT_TOKEN=$BOT_TOKEN -v $(pwd)/volume:/volume negebauer/telegram-bot",
+    "docker:run": "docker run --rm -ti -e BOT_TOKEN=$BOT_TOKEN -e CHAT_ID=$CHAT_ID -e VISA_USER=$VISA_USER -e VISA_PASSWORD=$VISA_PASSWORD -v $(pwd)/volume:/volume negebauer/telegram-bot",
     "lint": "concurrently 'yarn:lint:code' 'yarn:lint:package'",
     "lint:code": "eslint src scripts",
     "lint:code:fix": "yarn lint:code --fix",
