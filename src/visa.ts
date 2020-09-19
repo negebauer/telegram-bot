@@ -3,7 +3,7 @@ import config from './config'
 import { BotContext } from '.'
 
 const MAX_TRIES = 5
-const { url } = config.visa
+let RUNNING = false
 
 function retry(
   ctx: BotContext,
@@ -14,6 +14,7 @@ function retry(
   // eslint-disable-next-line no-use-before-define
   if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
 
+  RUNNING = false
   if (!error) return ctx.reply('Try again')
   return ctx.reply(error.toString())
 }
@@ -81,9 +82,8 @@ async function visa(
 
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
-    if (new Date().getMonth() === 8) await page.click('a[title="Next"]')
-    const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
-    return ctx.replyWithPhoto({ source: screenshotBuffer })
+    RUNNING = false
+    return undefined
   } catch (error) {
     return retry(ctx, next, tryNumber, error)
   }
