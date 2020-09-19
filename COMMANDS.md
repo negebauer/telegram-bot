@@ -27,6 +27,8 @@ Get the available visa appointment dates.
 ## weight
 
 Update your weight for the soccer calories calculation.
+Or get the current weight.
 
 - `/weight amount`: where amount is in kg.
-  - `/weight 86`
+  - `/weight 86`: set 86kg as weight.
+  - `/weight current`: get current weight.

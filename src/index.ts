@@ -65,12 +65,13 @@ bot.use((ctx, next) => {
 
 bot.command('weight', (ctx) => {
   const text = ctx.message?.text?.replace('/weight', '').trim()
+  const currentWeightString = `${ctx.session.weight} kg`
   if (!text)
     return ctx.replyWithMarkdown(
-      `Current is ${ctx.session.weight}\n\n${commandToMarkdown(
-        commands.weight,
-      )}`,
+      `${currentWeightString}\n\n${commandToMarkdown(commands.weight)}`,
     )
+
+  if (text === 'current') return ctx.reply(currentWeightString)
 
   const weight = Number(text)
   if (!weight) return ctx.reply(`Weight must be a number, ${text} is invalid`)
