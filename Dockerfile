@@ -13,16 +13,19 @@ COPY package.json .
 COPY yarn.lock .
 RUN yarn
 
-ENV VISA_USER ''
-ENV VISA_PASSWORD ''
-ENV BOT_TOKEN ''
-
 RUN mkdir volume
 VOLUME volume
 
 COPY COMMANDS.md COMMANDS.md
 COPY tsconfig.json tsconfig.json
+COPY scripts scripts
 COPY src src
 
+ENV BOT_TOKEN ''
+ENV CHAT_ID ''
+ENV VISA_PASSWORD ''
+ENV VISA_URL ''
+ENV VISA_USER ''
 ENV NODE_ENV production
+
 CMD ["yarn", "start"]
