@@ -19,15 +19,48 @@ function retry(
   return ctx.reply(error.toString())
 }
 
+async function checkForEarliestAppointment(
+  ctx: BotContext,
+  page: puppeteer.Page,
+): Promise<void> {
+  const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
+  let caption = ''
+  try {
+    const dayElement = await page.$('a.ui-state-default')
+    if (!dayElement) return
+    const day = await dayElement
+      .getProperty('textContent')
+      .then((textContent) => textContent.jsonValue())
+    const month = await dayElement
+      .getProperty('parentElement')
+      .then((element) => element.getProperty('parentElement'))
+      .then((element) => element.getProperty('parentElement'))
+      .then((element) => element.getProperty('parentElement'))
+      .then((element) => element.getProperty('parentElement'))
+      .then((element) => element.getProperty('firstElementChild'))
+      .then((element) => element.getProperty('lastElementChild'))
+      .then((element) => element.getProperty('textContent'))
+      .then((textContent) => textContent.jsonValue())
+    caption = `${day} ${month}`
+  } catch (error) {
+    // do nothing
+  }
+  ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
+}
+
 async function visa(
   ctx: BotContext,
   next: unknown,
   tryNumber = 1,
 ): Promise<unknown> {
+  if (tryNumber === 1 && RUNNING) return ctx.reply('Already checking')
+  RUNNING = true
+
   try {
     // eslint-disable-next-line no-console
     console.log(`visa check #${tryNumber}`)
-    if (tryNumber === 1) ctx.reply(`Checking visa appointment info`)
+    if (tryNumber === 1)
+      ctx.replyWithMarkdown(`Checking [visa appointment](${config.visa.url})`)
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -36,7 +69,7 @@ async function visa(
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
     const page = await browser.newPage()
-    await page.goto(url)
+    await page.goto(config.visa.url)
 
     // login
     const [, ok] = await page.$$('button > span.ui-button-text')
@@ -50,7 +83,7 @@ async function visa(
     await page.click('input[type="submit"]')
     await page.waitForNavigation()
 
-    if (page.url() !== url) return retry(ctx, next, tryNumber)
+    if (page.url() !== config.visa.url) return retry(ctx, next, tryNumber)
 
     // check appointment not canceled
     const liElements = await page.$$('li.accordion-item > a > h5')
@@ -82,6 +115,11 @@ async function visa(
 
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
+    if (new Date().getMonth() === 8) {
+      await checkForEarliestAppointment(ctx, page)
+      await page.click('a[title="Next"]')
+    }
+    checkForEarliestAppointment(ctx, page)
     RUNNING = false
     return undefined
   } catch (error) {
