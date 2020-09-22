@@ -5,20 +5,6 @@ import { BotContext } from '.'
 const MAX_TRIES = 5
 let RUNNING = false
 
-function retry(
-  ctx: BotContext,
-  next: unknown,
-  tryNumber: number,
-  error?: Error,
-) {
-  // eslint-disable-next-line no-use-before-define
-  if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
-
-  RUNNING = false
-  if (!error) return ctx.reply('Try again')
-  return ctx.reply(error.toString())
-}
-
 async function checkForEarliestAppointment(
   ctx: BotContext,
   page: puppeteer.Page,
@@ -45,7 +31,7 @@ async function checkForEarliestAppointment(
   } catch (error) {
     // do nothing
   }
-  ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
+  await ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
 }
 
 async function visa(
@@ -56,23 +42,34 @@ async function visa(
   if (tryNumber === 1 && RUNNING) return ctx.reply('Already checking')
   RUNNING = true
 
-  try {
-    // eslint-disable-next-line no-console
-    console.log(`visa check #${tryNumber}`)
-    if (tryNumber === 1)
-      ctx.replyWithMarkdown(`Checking [visa appointment](${config.visa.url})`, {
-        disable_notification: true,
-      })
-
-    const browser = await puppeteer.launch({
-      headless: true,
-      defaultViewport: null,
-      slowMo: 50,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  // eslint-disable-next-line no-console
+  console.log(`visa check #${tryNumber}`)
+  if (tryNumber === 1)
+    ctx.replyWithMarkdown(`Checking [visa appointment](${config.visa.url})`, {
+      disable_notification: true,
     })
-    const page = await browser.newPage()
-    await page.goto(config.visa.url)
 
+  const browser = await puppeteer.launch({
+    headless: true,
+    defaultViewport: null,
+    slowMo: 50,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
+  const page = await browser.newPage()
+  await page.goto(config.visa.url)
+
+  async function retry(error?: Error) {
+    await page.close()
+    await browser.close()
+    // eslint-disable-next-line no-use-before-define
+    if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
+
+    RUNNING = false
+    if (!error) return ctx.reply('Try again')
+    return ctx.reply(error.toString())
+  }
+
+  try {
     // login
     const [, ok] = await page.$$('button > span.ui-button-text')
     await ok.click()
@@ -85,7 +82,7 @@ async function visa(
     await page.click('input[type="submit"]')
     await page.waitForNavigation()
 
-    if (page.url() !== config.visa.url) return retry(ctx, next, tryNumber)
+    if (page.url() !== config.visa.url) return retry()
 
     // check appointment not canceled
     const liElements = await page.$$('li.accordion-item > a > h5')
@@ -121,11 +118,13 @@ async function visa(
       await checkForEarliestAppointment(ctx, page)
       await page.click('a[title="Next"]')
     }
-    checkForEarliestAppointment(ctx, page)
+    await checkForEarliestAppointment(ctx, page)
     RUNNING = false
+    await page.close()
+    await browser.close()
     return undefined
   } catch (error) {
-    return retry(ctx, next, tryNumber, error)
+    return retry(error)
   }
 }
 
