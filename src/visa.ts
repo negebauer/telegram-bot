@@ -60,7 +60,9 @@ async function visa(
     // eslint-disable-next-line no-console
     console.log(`visa check #${tryNumber}`)
     if (tryNumber === 1)
-      ctx.replyWithMarkdown(`Checking [visa appointment](${config.visa.url})`)
+      ctx.replyWithMarkdown(`Checking [visa appointment](${config.visa.url})`, {
+        disable_notification: true,
+      })
 
     const browser = await puppeteer.launch({
       headless: true,
