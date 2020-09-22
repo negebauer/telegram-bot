@@ -7,4 +7,5 @@ docker run --rm -ti \
   -e VISA_URL=$VISA_URL \
   -e VISA_USER=$VISA_USER \
   -v $(pwd)/volume:/volume \
+  --name telegram-bot \
   negebauer/telegram-bot
