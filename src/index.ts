@@ -110,7 +110,9 @@ bot.command('soccer', (ctx) => {
   }
 
   const calories = soccerCalories(85, totalMinutes)
-  return ctx.reply(`You just burnt ${calories} calories`)
+  return ctx.reply(
+    `You just burnt ${calories} calories in ${totalMinutes} minutes`,
+  )
 })
 
 bot.command('visa', (ctx, next) => {
