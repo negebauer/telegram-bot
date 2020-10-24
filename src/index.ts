@@ -81,7 +81,7 @@ bot.command('weight', (ctx) => {
 })
 
 function soccerCalories(weight: number, minutes: number) {
-  return Math.floor(((7 * weight * 3.5) / 200) * minutes)
+  return Math.floor(((8.5 * weight * 3.5) / 200) * minutes)
 }
 
 bot.command('soccer', (ctx) => {
