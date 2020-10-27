@@ -3,7 +3,6 @@ import config from './config'
 import { BotContext } from '.'
 
 const MAX_TRIES = 5
-let RUNNING = false
 
 async function checkForEarliestAppointment(
   ctx: BotContext,
@@ -39,9 +38,6 @@ async function visa(
   next: unknown,
   tryNumber = 1,
 ): Promise<unknown> {
-  if (tryNumber === 1 && RUNNING) return ctx.reply('Already checking')
-  RUNNING = true
-
   // eslint-disable-next-line no-console
   console.log(`visa check #${tryNumber}`)
   if (tryNumber === 1)
@@ -64,7 +60,6 @@ async function visa(
     // eslint-disable-next-line no-use-before-define
     if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
 
-    RUNNING = false
     if (!error) return ctx.reply('Try again')
     return ctx.reply(error.toString())
   }
@@ -119,7 +114,6 @@ async function visa(
       await page.click('a[title="Next"]')
     }
     await checkForEarliestAppointment(ctx, page)
-    RUNNING = false
     await page.close()
     await browser.close()
     return undefined
