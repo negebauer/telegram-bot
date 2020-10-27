@@ -3,6 +3,7 @@ import path from 'path'
 import { Telegram, Telegraf, Context } from 'telegraf'
 import LocalSession from 'telegraf-session-local'
 import dayjs from 'dayjs'
+import { createLogicalAnd } from 'typescript'
 import { SceneContextMessageUpdate } from '../node_modules/telegraf/typings/stage.d'
 import config from './config'
 import loadCommands, { Command } from './loadCommands'
@@ -109,7 +110,7 @@ bot.command('soccer', (ctx) => {
     totalMinutes = Number(hours) * 60 + Number(minutes)
   }
 
-  const calories = soccerCalories(85, totalMinutes)
+  const calories = soccerCalories(weight, totalMinutes)
   return ctx.reply(
     `You just burnt ${calories} calories in ${totalMinutes} minutes`,
   )
