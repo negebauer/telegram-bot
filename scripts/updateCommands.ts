@@ -3,10 +3,18 @@ import { Telegram } from 'telegraf'
 import config from '../src/config'
 import loadCommands from '../src/loadCommands'
 
-const commands = loadCommands()
-const telegram = new Telegram(config.botToken)
-telegram.setMyCommands(Object.values(commands))
+async function updateCommands() {
+  const commands = loadCommands()
+  const telegram = new Telegram(config.botToken)
+  await telegram.setMyCommands(Object.values(commands))
 
-const msg = 'Commands updated'
-if (config.env.isProd) console.log(msg, '\n', JSON.stringify(commands, null, 4))
-else console.log(msg, Object.keys(commands))
+  const msg = 'Commands updated'
+  if (config.env.isProd)
+    console.log(msg, '\n', JSON.stringify(commands, null, 4))
+  else console.log(msg, Object.keys(commands))
+}
+
+updateCommands().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})
