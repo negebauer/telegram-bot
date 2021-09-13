@@ -63,6 +63,10 @@ bot.use((ctx, next) => {
   return next()
 })
 
+bot.command('chatid', (ctx) => {
+  ctx.reply(ctx.chat?.id.toString() || '')
+})
+
 bot.command('weight', (ctx) => {
   const text = ctx.message?.text?.replace('/weight', '').trim()
   const currentWeightString = `${ctx.session.weight} kg`

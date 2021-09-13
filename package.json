@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "yarn build --watch",
-    "dev": "concurrently 'yarn updateCommands' 'nodemon --watch src --ext ts,js,txt'",
+    "checkVolumeFolder": "mkdir -p volume",
+    "d": "nodemon --watch src --ext ts,js,txt --exec 'yarn r $1'",
+    "predev": "yarn checkVolumeFolder",
+    "dev": "concurrently 'nodemon --watch COMMANDS.md --watch scripts/updateCommands.ts --watch src/loadCommands.ts --exec yarn updateCommands' 'nodemon --watch src --ext ts,js,txt'",
     "dev:file": "nodemon --ext ts,js",
     "docker:build": "docker build -t negebauer/telegram-bot .",
     "docker:push": "docker push negebauer/telegram-bot",
@@ -17,8 +20,9 @@
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
+    "r": "node -r ts-node/register $1",
     "sendMessage": "ts-node scripts/sendMessage.ts $CHAT_ID",
-    "prestart": "yarn updateCommands",
+    "prestart": "yarn checkVolumeFolder && yarn updateCommands",
     "start": "node -r ts-node/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "updateCommands": "ts-node scripts/updateCommands.ts"
@@ -26,7 +30,7 @@
   "dependencies": {
     "@types/node": "^14.10.1",
     "@types/puppeteer": "^3.0.2",
-    "dayjs": "^1.8.35",
+    "dayjs": "^1.10.7",
     "puppeteer": "^5.3.0",
     "telegraf": "^3.38.0",
     "telegraf-session-local": "^2.0.0",

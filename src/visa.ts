@@ -1,22 +1,42 @@
+import { exec } from 'child_process'
 import puppeteer from 'puppeteer'
+import { Telegram } from 'telegraf'
+import dayjs from 'dayjs'
 import config from './config'
 import { BotContext } from '.'
 
 const MAX_TRIES = 5
+const RESCHEDULE_APPOINTMENT_TEXTS = [
+  'Reprogramar cita',
+  'Reschedule Appointment',
+]
+
+interface ReplyContext {
+  replyWithPhoto: BotContext['replyWithPhoto']
+  replyWithMarkdown: BotContext['replyWithMarkdown'] | (() => void)
+  reply: BotContext['reply']
+}
+
+async function getTextContext(
+  element: puppeteer.ElementHandle | puppeteer.JSHandle,
+): Promise<string> {
+  const textContext = await element
+    .getProperty('textContent')
+    .then((textContent) => textContent.jsonValue())
+  return String(textContext)
+}
 
 async function checkForEarliestAppointment(
-  ctx: BotContext,
+  ctx: ReplyContext,
   page: puppeteer.Page,
+  currentDayMonth: string,
 ): Promise<void> {
   const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
-  let caption = ''
   try {
     const dayElement = await page.$('a.ui-state-default')
     if (!dayElement) return
-    const day = await dayElement
-      .getProperty('textContent')
-      .then((textContent) => textContent.jsonValue())
-    const month = await dayElement
+    const day = await getTextContext(dayElement)
+    const monthElement = await dayElement
       .getProperty('parentElement')
       .then((element) => element.getProperty('parentElement'))
       .then((element) => element.getProperty('parentElement'))
@@ -24,18 +44,19 @@ async function checkForEarliestAppointment(
       .then((element) => element.getProperty('parentElement'))
       .then((element) => element.getProperty('firstElementChild'))
       .then((element) => element.getProperty('lastElementChild'))
-      .then((element) => element.getProperty('textContent'))
-      .then((textContent) => textContent.jsonValue())
-    caption = `${day} ${month}`
+    const month = await getTextContext(monthElement)
+    const caption = `${day} ${month}`
+    if (dayjs(caption) < dayjs(`${currentDayMonth} ${dayjs().year()}`)) {
+      await ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
+    }
   } catch (error) {
     // do nothing
   }
-  await ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
 }
 
 async function visa(
-  ctx: BotContext,
-  next: unknown,
+  ctx: ReplyContext,
+  next: unknown = null,
   tryNumber = 1,
 ): Promise<unknown> {
   // eslint-disable-next-line no-console
@@ -66,8 +87,9 @@ async function visa(
 
   try {
     // login
-    const [, ok] = await page.$$('button > span.ui-button-text')
-    await ok.click()
+    const buttons = await page.$$('button')
+    const buttonTexts = await Promise.all(buttons.map(getTextContext))
+    await buttons[buttonTexts.indexOf('OK')].click()
     // await page.click('a.down-arrow.bounce')
     await page.click('input[type="email"]')
     await page.keyboard.type(config.visa.email, { delay: 4 })
@@ -79,18 +101,26 @@ async function visa(
 
     if (page.url() !== config.visa.url) return retry()
 
+    // get current appointment date
+    const aElements = await page.$$('a')
+    const aTexts = await Promise.all(aElements.map(getTextContext))
+    await aElements[aTexts.indexOf('Go Back')].click()
+    await page.waitForNavigation()
+
+    const currentDateElement = await page.$('p.consular-appt')
+    if (!currentDateElement) return ctx.reply('No pude ver la fecha actual')
+
+    const currentDateText = await getTextContext(currentDateElement)
+    const currentDayMonth = currentDateText.split(',')[0].split(':')[1].trim()
+    await page.goBack()
+
     // check appointment not canceled
     const liElements = await page.$$('li.accordion-item > a > h5')
-    const textContext = await Promise.all(
-      liElements.map((element) =>
-        element
-          .getProperty('textContent')
-          .then((textContent) => textContent.jsonValue()),
-      ),
-    )
+    const textContext = await Promise.all(liElements.map(getTextContext))
     const changeAppointmentButtonIndex = textContext.findIndex((text) => {
       if (typeof text !== 'string') return false
-      return text.trim() === 'Reprogramar cita'
+      const expectedTexts = RESCHEDULE_APPOINTMENT_TEXTS
+      return expectedTexts.includes(text.trim())
     })
     if (changeAppointmentButtonIndex === -1) return ctx.reply('Cancelada')
 
@@ -104,22 +134,33 @@ async function visa(
       .then((e3) => e3.asElement()?.$('a'))
     if (!changeAppointmentButton) return 'changeAppointmentButton notFound'
 
-    await changeAppointmentButton.click()
+    await changeAppointmentButton?.click()
     await page.waitForNavigation()
 
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
-    if (new Date().getMonth() === 8) {
-      await checkForEarliestAppointment(ctx, page)
-      await page.click('a[title="Next"]')
-    }
-    await checkForEarliestAppointment(ctx, page)
+    // September and October
+    await checkForEarliestAppointment(ctx, page, currentDayMonth)
+    await page.click('a[title="Next"]')
+    // November
+    await checkForEarliestAppointment(ctx, page, currentDayMonth)
     await page.close()
     await browser.close()
     return undefined
   } catch (error) {
     return retry(error)
   }
+}
+
+if (require.main === module) {
+  exec('killall Chromium')
+  const telegram = new Telegram(config.botToken)
+  visa({
+    replyWithPhoto: (...params) => telegram.sendPhoto(config.chatId, ...params),
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    replyWithMarkdown: () => {},
+    reply: (...params) => telegram.sendMessage(config.chatId, ...params),
+  })
 }
 
 export default visa
