@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "yarn build --watch",
-    "dev": "concurrently 'yarn updateCommands' 'nodemon --watch src --ext ts,js,txt'",
+    "checkVolumeFolder": "mkdir -p volume",
+    "d": "nodemon --watch src --ext ts,js,txt --exec 'yarn r $1'",
+    "predev": "yarn checkVolumeFolder",
+    "dev": "concurrently 'nodemon --watch COMMANDS.md --watch scripts/updateCommands.ts --watch src/loadCommands.ts --exec yarn updateCommands' 'nodemon --watch src --ext ts,js,txt'",
     "dev:file": "nodemon --ext ts,js",
     "docker:build": "docker build -t negebauer/telegram-bot .",
     "docker:push": "docker push negebauer/telegram-bot",
@@ -19,7 +22,7 @@
     "lint:package:fix": "sort-package-json",
     "r": "node -r ts-node/register $1",
     "sendMessage": "ts-node scripts/sendMessage.ts $CHAT_ID",
-    "prestart": "yarn updateCommands",
+    "prestart": "yarn checkVolumeFolder && yarn updateCommands",
     "start": "node -r ts-node/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "updateCommands": "ts-node scripts/updateCommands.ts"
