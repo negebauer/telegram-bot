@@ -17,6 +17,7 @@
     "lint:fix": "concurrently 'yarn:lint:code:fix' 'yarn:lint:package:fix'",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
+    "r": "node -r ts-node/register $1",
     "sendMessage": "ts-node scripts/sendMessage.ts $CHAT_ID",
     "prestart": "yarn updateCommands",
     "start": "node -r ts-node/register src/index.ts",
