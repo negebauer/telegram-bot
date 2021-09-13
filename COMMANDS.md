@@ -1,9 +1,14 @@
 # Commands <!-- omit in TOC -->
 
+- [chatid](#chatid)
 - [help](#help)
 - [soccer](#soccer)
 - [visa](#visa)
 - [weight](#weight)
+
+## chatid
+
+Get the id of the chat with the bott
 
 ## help
 
