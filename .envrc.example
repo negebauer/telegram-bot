@@ -8,9 +8,17 @@
 #####    Replace this variables    #####
 ########################################
 
-# The telegram bot token
+# The telegram bot token. Get it by talking to @BotFather https://core.telegram.org/bots#3-how-do-i-create-a-bot
 export BOT_TOKEN=BOT_TOKEN
+
+# The id of your chat with the bot if you want it to send you messages directly (like when running the visa appointment checker)
+# To obtain it you can run the bot and use the /chatid command or talk to https://t.me/getidsbot and get the id from it.
 export CHAT_ID=CHAT_ID
-export VISA_PASSWORD=VISA_PASSWORD
+
+# The visa appointment website url where you can do actions on your current appointment (like print instructions and reschedule)
+# Should look like this: https://ais.usvisa-info.com/en-cl/niv/schedule/<id>/continue_actions
 export VISA_URL=VISA_URL
+
+# Your visa appointment website username and password
 export VISA_USER=VISA_USER
+export VISA_PASSWORD=VISA_PASSWORD
