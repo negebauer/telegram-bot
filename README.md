@@ -5,16 +5,29 @@
 
 Personal telegram bot
 
-- [Commands](#commands)
-- [Run code](#run-code)
+- [Getting started](#getting-started)
+  - [Run the complete bot](#run-the-complete-bot)
+  - [Run a file](#run-a-file)
+- [Bot commands](#bot-commands)
 
-## Commands
+## Getting started
 
-Check the [COMMANDS](./COMMANDS.md)
+- Clone the repository.
+- Run `yarn`.
+- Copy the `.envrc.example` file to `.envrc` (`cp .envrc.example .envrc`).
+  - You'll need the [direnv](https://direnv.net/) program to load the env variables or source the `.envrc` file manually (`source .envrc`).
+  - Check the `.envrc` file for explanations on each env var and how to get it.
 
-## Run code
+### Run the complete bot
 
-- `yarn dev` to run the complete bot in dev mode.
-- `yarn start` to run the complete bot.
-- `yarn r` to run a single file.
-- `yarn d` to run a single file in dev mode.
+- Use `yarn start` to run the complete bot in prod mode.
+- Use `yarn dev` to run the complete bot in dev mode.
+
+### Run a file
+
+- Use `yarn r` to run a single file in prod mode.
+- Use `yarn d` to run a single file in dev mode.
+
+## Bot commands
+
+Check the commands that the bot supports in [COMMANDS](./COMMANDS.md)
