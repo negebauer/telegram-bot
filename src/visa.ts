@@ -137,6 +137,13 @@ async function visa(
     await changeAppointmentButton?.click()
     await page.waitForNavigation()
 
+    // check if appointment group, if press continue
+    const continueButton = await page.$('[name=commit]')
+    if (continueButton) {
+      await continueButton.click()
+      await page.waitForNavigation({ waitUntil: 'networkidle0' })
+    }
+
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
     // September and October
