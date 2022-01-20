@@ -155,6 +155,9 @@ async function visa(
     await browser.close()
     return undefined
   } catch (error) {
+    if (config.env.isDev) {
+      console.log('Error getting appointment', error)
+    }
     return retry(error)
   }
 }
