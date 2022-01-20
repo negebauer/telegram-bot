@@ -29,29 +29,21 @@ async function getTextContext(
 async function checkForEarliestAppointment(
   ctx: ReplyContext,
   page: puppeteer.Page,
-  currentDayMonth: string,
-): Promise<void> {
-  const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
-  try {
-    const dayElement = await page.$('a.ui-state-default')
-    if (!dayElement) return
-    const day = await getTextContext(dayElement)
-    const monthElement = await dayElement
-      .getProperty('parentElement')
-      .then((element) => element.getProperty('parentElement'))
-      .then((element) => element.getProperty('parentElement'))
-      .then((element) => element.getProperty('parentElement'))
-      .then((element) => element.getProperty('parentElement'))
-      .then((element) => element.getProperty('firstElementChild'))
-      .then((element) => element.getProperty('lastElementChild'))
-    const month = await getTextContext(monthElement)
-    const caption = `${day} ${month}`
-    if (dayjs(caption) < dayjs(`${currentDayMonth} ${dayjs().year()}`)) {
-      await ctx.replyWithPhoto({ source: screenshotBuffer }, { caption })
-    }
-  } catch (error) {
-    // do nothing
-  }
+): Promise<string | undefined> {
+  const dayElement = await page.$('a.ui-state-default')
+  if (!dayElement) return undefined
+  const day = await getTextContext(dayElement)
+  const monthElement = await dayElement
+    .getProperty('parentElement')
+    .then((element) => element.getProperty('parentElement'))
+    .then((element) => element.getProperty('parentElement'))
+    .then((element) => element.getProperty('parentElement'))
+    .then((element) => element.getProperty('parentElement'))
+    .then((element) => element.getProperty('firstElementChild'))
+    .then((element) => element.getProperty('lastElementChild'))
+  const month = await getTextContext(monthElement)
+  const caption = `${day} ${month}`
+  return caption
 }
 
 async function visa(
@@ -146,11 +138,34 @@ async function visa(
 
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
-    // September and October
-    await checkForEarliestAppointment(ctx, page, currentDayMonth)
-    await page.click('a[title="Next"]')
-    // November
-    await checkForEarliestAppointment(ctx, page, currentDayMonth)
+    let nextAppointment = await checkForEarliestAppointment(ctx, page)
+    while (nextAppointment == null) {
+      // eslint-disable-next-line no-await-in-loop
+      await page.click('a[title="Next"]')
+      // eslint-disable-next-line no-await-in-loop
+      await page.click('a[title="Next"]')
+      // eslint-disable-next-line no-await-in-loop
+      nextAppointment = await checkForEarliestAppointment(ctx, page)
+    }
+    const isAppointmentEarlier =
+      dayjs(nextAppointment) < dayjs(`${currentDayMonth} ${dayjs().year()}`)
+    if (config.env.isDev) {
+      console.log('Current appointment', currentDayMonth)
+      console.log('Found appointment', nextAppointment)
+      console.log(
+        isAppointmentEarlier
+          ? 'Appointment is earlier!'
+          : 'Appointment is not earlier',
+      )
+    }
+    const screenshotBuffer = await page.screenshot({ encoding: 'binary' })
+    if (isAppointmentEarlier) {
+      await ctx.replyWithPhoto(
+        { source: screenshotBuffer },
+        { caption: nextAppointment },
+      )
+    }
+
     await page.close()
     await browser.close()
     return undefined
