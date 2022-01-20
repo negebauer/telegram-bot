@@ -104,6 +104,8 @@ async function visa(
 
     const currentDateText = await getTextContext(currentDateElement)
     const currentDayMonth = currentDateText.split(',')[0].split(':')[1].trim()
+    const currentYear = currentDateText.split(',')[1].trim()
+    const currentDate = `${currentDayMonth} ${currentYear}`
     await page.goBack()
 
     // check appointment not canceled
@@ -148,9 +150,9 @@ async function visa(
       nextAppointment = await checkForEarliestAppointment(ctx, page)
     }
     const isAppointmentEarlier =
-      dayjs(nextAppointment) < dayjs(`${currentDayMonth} ${dayjs().year()}`)
+      dayjs(nextAppointment) < dayjs(`${currentDate} ${dayjs().year()}`)
     if (config.env.isDev) {
-      console.log('Current appointment', currentDayMonth)
+      console.log('Current appointment', currentDate)
       console.log('Found appointment', nextAppointment)
       console.log(
         isAppointmentEarlier
