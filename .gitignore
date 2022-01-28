@@ -1,6 +1,7 @@
 volume
 .envrc
 .DS_Store
+appointments.csv
 
 # Logs
 logs

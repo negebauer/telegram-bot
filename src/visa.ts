@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import fs from 'fs'
 import puppeteer from 'puppeteer'
 import { Telegram } from 'telegraf'
 import dayjs from 'dayjs'
@@ -50,6 +51,7 @@ async function visa(
   ctx: ReplyContext,
   next: unknown = null,
   tryNumber = 1,
+  writeFoundAppointmentsToFilePath = '',
 ): Promise<unknown> {
   // eslint-disable-next-line no-console
   console.log(`visa check #${tryNumber}`)
@@ -71,7 +73,8 @@ async function visa(
     await page.close()
     await browser.close()
     // eslint-disable-next-line no-use-before-define
-    if (tryNumber < MAX_TRIES) return visa(ctx, next, tryNumber + 1)
+    if (tryNumber < MAX_TRIES)
+      return visa(ctx, next, tryNumber + 1, writeFoundAppointmentsToFilePath)
 
     if (!error) return ctx.reply('Try again')
     return ctx.reply(error.toString())
@@ -149,6 +152,12 @@ async function visa(
       // eslint-disable-next-line no-await-in-loop
       nextAppointment = await checkForEarliestAppointment(ctx, page)
     }
+    if (writeFoundAppointmentsToFilePath) {
+      const line = nextAppointment.split(' ').join(',')
+      fs.appendFile(writeFoundAppointmentsToFilePath, line, () => {
+        // do nothing
+      })
+    }
     const isAppointmentEarlier =
       dayjs(nextAppointment) < dayjs(`${currentDate} ${dayjs().year()}`)
     if (config.env.isDev) {
@@ -182,12 +191,18 @@ async function visa(
 if (require.main === module) {
   exec('killall Chromium')
   const telegram = new Telegram(config.botToken)
-  visa({
-    replyWithPhoto: (...params) => telegram.sendPhoto(config.chatId, ...params),
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    replyWithMarkdown: () => {},
-    reply: (...params) => telegram.sendMessage(config.chatId, ...params),
-  })
+  visa(
+    {
+      replyWithPhoto: (...params) =>
+        telegram.sendPhoto(config.chatId, ...params),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      replyWithMarkdown: () => {},
+      reply: (...params) => telegram.sendMessage(config.chatId, ...params),
+    },
+    null,
+    1,
+    'appointments.csv',
+  )
 }
 
 export default visa
