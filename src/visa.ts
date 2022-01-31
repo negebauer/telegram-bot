@@ -173,7 +173,7 @@ async function visa(
     if (isAppointmentEarlier) {
       await ctx.replyWithPhoto(
         { source: screenshotBuffer },
-        { caption: nextAppointment },
+        { caption: `${nextAppointment} ${config.visa.url}` },
       )
     }
 
