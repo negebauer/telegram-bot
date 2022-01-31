@@ -43,7 +43,7 @@ async function checkForEarliestAppointment(
     .then((element) => element.getProperty('firstElementChild'))
     .then((element) => element.getProperty('lastElementChild'))
   const month = await getTextContext(monthElement)
-  const caption = `${day} ${month}`
+  const caption = `${day} ${month.split(' ').join(' ')}`
   return caption
 }
 
