@@ -153,7 +153,7 @@ async function visa(
       nextAppointment = await checkForEarliestAppointment(ctx, page)
     }
     if (writeFoundAppointmentsToFilePath) {
-      const line = nextAppointment.split(' ').join(',')
+      const line = `${nextAppointment.split(' ').join(',')}\n`
       fs.appendFile(writeFoundAppointmentsToFilePath, line, () => {
         // do nothing
       })
