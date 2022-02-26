@@ -141,6 +141,22 @@ async function visa(
       await page.waitForNavigation({ waitUntil: 'networkidle0' })
     }
 
+    // check that there are appointments
+    const noAppointmentsMessage = await page.$(
+      '#consulate_date_time_not_available',
+    )
+    if (noAppointmentsMessage != null) {
+      if (config.env.isDev) {
+        console.log('No appointments available')
+      }
+      ctx.replyWithMarkdown(`No appointments available`, {
+        disable_notification: true,
+      })
+      await page.close()
+      await browser.close()
+      return undefined
+    }
+
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
     let nextAppointment = await checkForEarliestAppointment(ctx, page)
