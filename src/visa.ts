@@ -61,7 +61,7 @@ async function visa(
     })
 
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     defaultViewport: null,
     slowMo: 50,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -92,7 +92,11 @@ async function visa(
     await page.keyboard.type(config.visa.password, { delay: 4 })
     await page.click('input[type="checkbox"]')
     await page.click('input[type="submit"]')
-    await page.waitForNavigation()
+    try {
+      await page.waitForNavigation()
+    } catch (error) {
+      // skip
+    }
 
     if (page.url() !== config.visa.url) return retry()
 
@@ -116,8 +120,7 @@ async function visa(
     const textContext = await Promise.all(liElements.map(getTextContext))
     const changeAppointmentButtonIndex = textContext.findIndex((text) => {
       if (typeof text !== 'string') return false
-      const expectedTexts = RESCHEDULE_APPOINTMENT_TEXTS
-      return expectedTexts.includes(text.trim())
+      return RESCHEDULE_APPOINTMENT_TEXTS.includes(text.trim())
     })
     if (changeAppointmentButtonIndex === -1) return ctx.reply('Cancelada')
 
