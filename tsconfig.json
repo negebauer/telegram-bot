@@ -16,7 +16,7 @@
     "outDir": "dist"
   },
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 12",
+  "display": "Node 16",
   "include": [
     "src/**/*.ts"
   ]
