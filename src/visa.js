@@ -4,8 +4,7 @@ const puppeteer = require('puppeteer')
 // import { Telegram } from 'telegraf'
 const pkg = require('telegraf');
 const { Telegram } = pkg;
-const dayjs  = require( 'dayjs')
-// import config from 'config'
+const dayjs  = require('dayjs')
 // import { BotContext } from '.'
 
 const {
@@ -14,6 +13,7 @@ const {
   VISA_PASSWORD,
   VISA_URL,
   VISA_USER,
+  VISA_START_DATE,
   NODE_ENV = 'development',
 } = process.env
 
@@ -33,6 +33,7 @@ const config = {
     email: VISA_USER,
     password: VISA_PASSWORD,
     url: VISA_URL,
+    startDate: VISA_START_DATE
   },
 }
 
@@ -202,6 +203,15 @@ async function visa(
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
     let nextAppointment = await checkForEarliestAppointment(ctx, page)
+    function checkStartDate() {
+      if (nextAppointment != null && config.visa.startDate != null && dayjs(nextAppointment) < dayjs(config.visa.startDate)) {
+        if (config.env.isDev) {
+          console.log('Found appointment', nextAppointment, 'which is before start date', config.visa.startDate)
+        }
+        nextAppointment = null
+      }
+    }
+    checkStartDate()
     while (nextAppointment == null) {
       // eslint-disable-next-line no-await-in-loop
       await page.click('a[title="Next"]')
@@ -209,6 +219,7 @@ async function visa(
       await page.click('a[title="Next"]')
       // eslint-disable-next-line no-await-in-loop
       nextAppointment = await checkForEarliestAppointment(ctx, page)
+      checkStartDate()
     }
     if (writeFoundAppointmentsToFilePath) {
       const line = `${nextAppointment.split(' ').join(',')}\n`
@@ -217,7 +228,7 @@ async function visa(
       })
     }
     const isAppointmentEarlier =
-      dayjs(nextAppointment) < dayjs(`${currentDate} ${dayjs().year()}`)
+      dayjs(nextAppointment) < dayjs(currentDate)
     if (config.env.isDev) {
       console.log('Current appointment', currentDate)
       console.log('Found appointment', nextAppointment)

@@ -22,3 +22,6 @@ export VISA_URL=VISA_URL
 # Your visa appointment website username and password
 export VISA_USER=VISA_USER
 export VISA_PASSWORD=VISA_PASSWORD
+
+# Only look for visa appointments after this date
+export VISA_START_DATE=DATE_YEAR_MONTH_DAY
