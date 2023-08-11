@@ -206,7 +206,7 @@ async function visa(
     function checkStartDate() {
       if (nextAppointment != null && config.visa.startDate != null && dayjs(nextAppointment) < dayjs(config.visa.startDate)) {
         if (config.env.isDev) {
-          console.log('There\'s one appointment', nextAppointment, 'before start date', config.visa.startDate)
+          console.log('Skipped appointment', nextAppointment, '< start date', config.visa.startDate)
         }
         nextAppointment = null
       }
