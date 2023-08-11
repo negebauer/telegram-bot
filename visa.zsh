@@ -15,7 +15,7 @@ else
   echo "Nothing...    $(date)"
 fi
 
-# wait 30 minutes
-sleep "$((60*30))"
+# wait 40 minutes
+sleep "$((60*40))"
 
 done
