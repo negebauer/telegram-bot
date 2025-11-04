@@ -93,7 +93,6 @@ async function checkForEarliestAppointment(
   const dayElements = await page.$$('a.ui-state-default')
   const dates = await Promise.all(dayElements.map(getDateFromNode))
   const filteredDates = dates.filter(isAfterStartDate)
-  console.log('dates', dates, 'filteredDates', filteredDates)
   return filteredDates.at(0)
 }
 
