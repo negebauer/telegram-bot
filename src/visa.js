@@ -58,14 +58,19 @@ async function getTextContext(
   return String(textContext)
 }
 
-async function checkForEarliestAppointment(
-  ctx,//: ReplyContext,
-  page,//: puppeteer.Page,
-)
-// : Promise<string | undefined>
-{
-  const dayElement = await page.$('a.ui-state-default')
-  if (!dayElement) return undefined
+function isAfterStartDate(nextAppointment) {
+  if (nextAppointment != null && config.visa.startDate != null && dayjs(nextAppointment) < dayjs(config.visa.startDate)) {
+    if (config.env.isDev) {
+      console.log('Skipped appointment', nextAppointment, '< start date', config.visa.startDate)
+    }
+    return false
+  }
+
+  return true
+}
+
+async function getDateFromNode(dayElement) {
+  if (!dayElement) return null
   const day = await getTextContext(dayElement)
   const monthElement = await dayElement
     .getProperty('parentElement')
@@ -76,8 +81,20 @@ async function checkForEarliestAppointment(
     .then((element) => element.getProperty('firstElementChild'))
     .then((element) => element.getProperty('lastElementChild'))
   const month = await getTextContext(monthElement)
-  const caption = `${day} ${month.split(' ').join(' ')}`
-  return caption
+  return `${day} ${month.split(' ').join(' ')}`
+}
+
+async function checkForEarliestAppointment(
+  ctx,//: ReplyContext,
+  page,//: puppeteer.Page,
+)
+// : Promise<string | undefined>
+{
+  const dayElements = await page.$$('a.ui-state-default')
+  const dates = await Promise.all(dayElements.map(getDateFromNode))
+  const filteredDates = dates.filter(isAfterStartDate)
+  console.log('dates', dates, 'filteredDates', filteredDates)
+  return filteredDates.at(0)
 }
 
 async function visa(
@@ -203,15 +220,6 @@ async function visa(
     // check next appointment
     await page.click('#appointments_consulate_appointment_date')
     let nextAppointment = await checkForEarliestAppointment(ctx, page)
-    function checkStartDate() {
-      if (nextAppointment != null && config.visa.startDate != null && dayjs(nextAppointment) < dayjs(config.visa.startDate)) {
-        if (config.env.isDev) {
-          console.log('Skipped appointment', nextAppointment, '< start date', config.visa.startDate)
-        }
-        nextAppointment = null
-      }
-    }
-    checkStartDate()
     while (nextAppointment == null) {
       // eslint-disable-next-line no-await-in-loop
       await page.click('a[title="Next"]')
@@ -219,7 +227,6 @@ async function visa(
       await page.click('a[title="Next"]')
       // eslint-disable-next-line no-await-in-loop
       nextAppointment = await checkForEarliestAppointment(ctx, page)
-      checkStartDate()
     }
     if (writeFoundAppointmentsToFilePath) {
       const line = `${nextAppointment.split(' ').join(',')}\n`
